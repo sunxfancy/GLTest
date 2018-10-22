@@ -239,11 +239,12 @@ int main()
     static std::chrono::high_resolution_clock::time_point frame_end;
     static int64_t total_frame_time_ns;
 
+    frame_start = std::chrono::high_resolution_clock::now();
+    int counter = 0;
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
-        frame_start = std::chrono::high_resolution_clock::now();
         // input
         // -----
         processInput(window);
@@ -270,12 +271,16 @@ int main()
 
         // measure performance
         total_frame_time_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(frame_end - frame_start).count();
-
-        std::stringstream title;
-        title.precision(3);
-        title.setf(std::ios_base::fixed, std::ios_base::floatfield);
-        title << "OpenGL Test | fps=" << 1000.0f / (float)(1e-6 * total_frame_time_ns);
-        glfwSetWindowTitle(window, title.str().c_str());
+        counter++;
+        if (total_frame_time_ns > 1e9) {
+            std::stringstream title;
+            title.precision(3);
+            title.setf(std::ios_base::fixed, std::ios_base::floatfield);
+            title << "OpenGL Test | fps=" << counter;
+            glfwSetWindowTitle(window, title.str().c_str());
+            counter = 0;
+            frame_start = std::chrono::high_resolution_clock::now();
+        }
     }
 
     // optional: de-allocate all resources once they've outlived their purpose:
